@@ -1,13 +1,20 @@
 import React from 'react';
 import axios from 'axios';
 
+import ContentWrapper from '../ContentWrapper';
+import TransferFilter from '../TransferFilter';
+import Content from '../Content';
+
+import 'antd/dist/antd.css';
+import './app.css';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       stateTickets: [],
       sortFlag: 'cheapest',
-      transferFlag: { 1: false, 2: false, 3: false, all: false },
+      transferFlag: { 1: false, 2: false, 3: 3, all: false },
     };
   }
 
@@ -118,7 +125,12 @@ class App extends React.Component {
     console.log(result);
     return (
       <div>
+        <ContentWrapper>
+          <TransferFilter />
+          <Content list={result} />
+        </ContentWrapper>
         {searchId}
+        Згзышл Pupsil
         <button type="button" onClick={() => this.changeTransferFlag(1)}>
           change
         </button>
