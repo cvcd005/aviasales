@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
+import PropTypes from 'prop-types';
 
 const BlankTicket = styled(Row)`
   width: 100%;
@@ -32,7 +33,6 @@ const SupportText = styled.span`
   text-transform: uppercase;
   color: #a0b0b9;
 `;
-
 const MainText = styled.span`
   font-weight: 600;
   font-size: 14px;
@@ -42,13 +42,13 @@ const MainText = styled.span`
 const String = styled(Row)`
   margin-top: 10px;
 `;
-const normalize = el => (el < 10 ? `0${el}` : el);
 
 const createTime = (time, duration) => {
   const startTime = new Date(time);
   const endTime = new Date(startTime.getTime() + duration * 60000);
   const hours = Math.floor(duration / 60);
-  const min = duration % 60; 
+  const min = duration % 60;
+  const normalize = el => (el < 10 ? `0${el}` : el);
   return [
     `${normalize(startTime.getUTCHours())} : ${normalize(startTime.getUTCMinutes())} - ${normalize(
       endTime.getUTCHours()
@@ -65,8 +65,8 @@ const Ticket = props => {
     segments: [ticketThere, ticketBack],
   } = obj;
 
-  const first = createTime(ticketThere.date, ticketThere.duration);
-  const second = createTime(ticketBack.date, ticketBack.duration);
+  const timeThere = createTime(ticketThere.date, ticketThere.duration);
+  const timeBack = createTime(ticketBack.date, ticketBack.duration);
 
   return (
     <BlankTicket>
@@ -87,14 +87,18 @@ const Ticket = props => {
         </Col>
         <Col span={8}>
           <SupportText>
-          {ticketThere.stops.length === 0 ? `Без пересадок` : ticketThere.stops.length > 1 ? `${ticketThere.stops.length} пересадки` : '1 пересадка'}
+            {ticketThere.stops.length === 0
+              ? `Без пересадок`
+              : ticketThere.stops.length > 1
+              ? `${ticketThere.stops.length} пересадки`
+              : '1 пересадка'}
           </SupportText>
         </Col>
         <Col span={8}>
-          <MainText>{first[0]}</MainText>
+          <MainText>{timeThere[0]}</MainText>
         </Col>
         <Col span={8}>
-          <MainText>{first[1]}</MainText>
+          <MainText>{timeThere[1]}</MainText>
         </Col>
         <Col span={8}>
           <MainText>{ticketThere.stops.join(',')}</MainText>
@@ -109,14 +113,18 @@ const Ticket = props => {
         </Col>
         <Col span={8}>
           <SupportText>
-            {ticketBack.stops.length === 0 ? `Без пересадок` : ticketBack.stops.length > 1 ? `${ticketBack.stops.length} пересадки` : '1 пересадка'}
+            {ticketBack.stops.length === 0
+              ? `Без пересадок`
+              : ticketBack.stops.length > 1
+              ? `${ticketBack.stops.length} пересадки`
+              : '1 пересадка'}
           </SupportText>
         </Col>
         <Col span={8}>
-          <MainText>{second[0]}</MainText>
+          <MainText>{timeBack[0]}</MainText>
         </Col>
         <Col span={8}>
-          <MainText>{second[1]}</MainText>
+          <MainText>{timeBack[1]}</MainText>
         </Col>
         <Col span={8}>
           <MainText>{ticketBack.stops.join(',')}</MainText>
@@ -124,6 +132,14 @@ const Ticket = props => {
       </String>
     </BlankTicket>
   );
+};
+
+Ticket.propTypes = {
+  obj: PropTypes.shape({
+    price: PropTypes.number,
+    carrier: PropTypes.string,
+    segments: PropTypes.array,
+  }).isRequired,
 };
 
 export default Ticket;

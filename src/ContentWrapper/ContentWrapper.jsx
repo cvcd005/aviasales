@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Row } from 'antd';
+import PropTypes from 'prop-types';
 
 import logo from '../img/Logo.png'; // Tell Webpack this JS file uses this image
 
@@ -39,6 +40,10 @@ const ContentWrapper = props => {
       <Wrapper>{children}</Wrapper>
     </Container>
   );
+};
+
+ContentWrapper.propTypes = {
+  children: PropTypes.element.isRequired,
 };
 
 export default ContentWrapper;
