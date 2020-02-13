@@ -50,17 +50,26 @@ const Label = styled.label.attrs(props => ({ htmlFor: props.htmlFor }))`
   }
 `;
 
-const TransferFilter = (props) => {
-  return (
-    <Container xs={22} sm={8}>
-      <Title>Количество пересадок </Title>
-      <Label htmlFor={"all"} active><CheckBox id={'all'}/>Все</Label>
-      <Label htmlFor={"zero"} active><CheckBox id={'zero'}/>Без пересадок</Label>
-      <Label htmlFor={"one"}><CheckBox id={'one'}/>1 пересадка</Label>
-      <Label htmlFor={"two"}><CheckBox id={'two'}/>2 пересадки</Label>
-      <Label htmlFor={"three"}><CheckBox id={'three'} className='pupsik'/>3 пересадки</Label>
-    </Container>
-  )
+class TransferFilter extends React.Component {
+  onClick = (value) => (e) => {
+    e.preventDefault();
+    const { changeTransferFlag } = this.props;
+    changeTransferFlag(value);
+  }
+
+  render() {
+    const {changeTransferFlag, transferFlag } = this.props;
+    return (
+      <Container xs={22} sm={8}>
+        <Title>Количество пересадок </Title>
+        <Label htmlFor={"all"} active={transferFlag['all']} onClick={this.onClick('all')}><CheckBox id={'all'} />Все</Label>
+        <Label htmlFor={"zero"} active={transferFlag[0]} onClick={this.onClick(0)}><CheckBox id={'zero'}/>Без пересадок</Label>
+        <Label htmlFor={"one"} active={transferFlag[1]} onClick={this.onClick(1)}><CheckBox id={'one'}/>1 пересадка</Label>
+        <Label htmlFor={"two"} active={transferFlag[2]} onClick={this.onClick(2)}><CheckBox id={'two'}/>2 пересадки</Label>
+        <Label htmlFor={"three"} active={transferFlag[3]} onClick={this.onClick(3)}><CheckBox id={'three'} className='pupsik'/>3 пересадки</Label>
+      </Container>
+    )
+  }
 }
 
 export default TransferFilter;

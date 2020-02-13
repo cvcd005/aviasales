@@ -1,9 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { Col } from 'antd';
 
 import ContentWrapper from '../ContentWrapper';
 import TransferFilter from '../TransferFilter';
-import Content from '../Content';
+import ButtonFilter from '../ButtonFilter';
+import TicketsList from '../TicketsList';
 
 import 'antd/dist/antd.css';
 import './app.css';
@@ -13,23 +15,14 @@ class App extends React.Component {
     super(props);
     this.state = {
       stateTickets: [],
-      sortFlag: 'cheapest',
-      transferFlag: { 1: false, 2: false, 3: 3, all: false },
+      sortFlag: 'fastest',
+      transferFlag: { '0': true, '1': false, '2': false, '3': false, all: false },
     };
   }
 
   async componentDidMount() {
     this.getId();
   }
-
-  changeTransferFlag = value => {
-    const { transferFlag } = this.state;
-    if (transferFlag[value]) {
-      this.setState({ transferFlag: { ...transferFlag, [value]: false } });
-    } else {
-      this.setState({ transferFlag: { ...transferFlag, [value]: value } });
-    }
-  };
 
   getId = async () => {
     const response = await axios.get('https://front-test.beta.aviasales.ru/search');
@@ -62,12 +55,48 @@ class App extends React.Component {
     }
   };
 
+  changeTransferFlag = value => {
+    if (value === 'all') {
+      this.setState(state => {
+        const { all } = state.transferFlag;
+        if (all) {
+          return { transferFlag: { '0': true, '1': false, '2': false, '3': false, all: false } };
+        }
+        return { transferFlag: { '0': true, '1': true, '2': true, '3': true, all: true } };
+      });
+    } else {
+      this.setState(state => {
+        const { transferFlag } = state;
+        return { transferFlag: { ...transferFlag, [value]: !transferFlag[value], all: false } };
+      });
+    }
+  };
+
   transferFilter = ar => {
     const { transferFlag } = this.state;
-    // есл нажата галачка все
+    // если нажата галачка все
     if (transferFlag.all) {
       return ar;
     }
+
+    const flags = [];
+    for (let i = 0; i < 4; i++) {
+      if (transferFlag[i]) {
+        flags.push(i);
+      }
+    }
+    console.log(flags);
+    const stopLeng = stop => flags.includes(stop);
+
+    const fn = ticket => {
+      const [seg1, seg2] = ticket.segments;
+      return stopLeng(seg1.stops.length) && stopLeng(seg2.stops.length);
+    };
+
+    return ar.filter(fn);
+    // собираем все галочки
+
+    /*
     let fn = (el, value) => el[0].stops.length === value && el[1].stops.length === value;
     const values = Object.values(transferFlag).filter(e => e);
     // если нажата какая-то одна из галочек
@@ -88,6 +117,7 @@ class App extends React.Component {
     }
     // если все галочки выключены фильтруем с 0 пересадок
     return ar.filter(el => fn(el.segments, 0));
+    */
   };
 
   sortFilter = ar => {
@@ -119,6 +149,13 @@ class App extends React.Component {
     }
   };
 
+  changeSortFlag = () => {
+    this.setState(state => {
+      const { sortFlag } = state;
+      return sortFlag === 'cheapest' ? { sortFlag: 'fastest' } : { sortFlag: 'cheapest' };
+    });
+  };
+
   render() {
     const { searchId, stateTickets } = this.state;
     const result = this.sortFilter(this.transferFilter(stateTickets)).slice(0, 5);
@@ -126,8 +163,14 @@ class App extends React.Component {
     return (
       <div>
         <ContentWrapper>
-          <TransferFilter />
-          <Content list={result} />
+          <TransferFilter
+            changeTransferFlag={this.changeTransferFlag}
+            transferFlag={this.state.transferFlag}
+          />
+          <Col xs={22} sm={15}>
+            <ButtonFilter changeSortFlag={this.changeSortFlag} sortFlag={this.state.sortFlag} />
+            <TicketsList list={result} />
+          </Col>
         </ContentWrapper>
         {searchId}
         Згзышл Pupsil

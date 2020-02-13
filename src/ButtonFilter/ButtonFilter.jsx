@@ -20,13 +20,21 @@ const Button = styled.button`
   color: ${props => (props.active ? '#FFFFFF' : '#4A4A4A')};
 `;
 
-const ButtonFilter = () => {
-  return (
-    <div>
-      <Button active>Самый дешевый</Button>
-      <Button>Самый быстрый</Button>
-    </div>
-  );
+class ButtonFilter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { activeCheapset: true, activeFastest: false };
+  }
+  
+  render() {
+    const {changeSortFlag, sortFlag} = this.props;
+    return (
+      <div>
+        <Button active={sortFlag==='cheapest'} onClick={()=>changeSortFlag()}>Самый дешевый</Button>
+        <Button active={sortFlag==='fastest'} onClick={()=>changeSortFlag()}>Самый быстрый</Button>
+      </div>
+    );
+  }
 };
 
 export default ButtonFilter;

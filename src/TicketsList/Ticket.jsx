@@ -47,12 +47,13 @@ const normalize = el => (el < 10 ? `0${el}` : el);
 const createTime = (time, duration) => {
   const startTime = new Date(time);
   const endTime = new Date(startTime.getTime() + duration * 60000);
-  const diff = new Date(endTime.getTime() - startTime.getTime());
+  const hours = Math.floor(duration / 60);
+  const min = duration % 60; 
   return [
     `${normalize(startTime.getUTCHours())} : ${normalize(startTime.getUTCMinutes())} - ${normalize(
       endTime.getUTCHours()
     )} : ${normalize(endTime.getUTCMinutes())}`,
-    `${normalize(diff.getUTCHours())}ч : ${normalize(diff.getUTCMinutes())}м`,
+    `${normalize(hours)}ч : ${normalize(min)}м`,
   ];
 };
 
@@ -61,11 +62,11 @@ const Ticket = props => {
   const {
     price,
     carrier,
-    segments: [segment1, segment2],
+    segments: [ticketThere, ticketBack],
   } = obj;
 
-  const first = createTime(segment1.date, segment1.duration);
-  const second = createTime(segment2.date, segment2.duration);
+  const first = createTime(ticketThere.date, ticketThere.duration);
+  const second = createTime(ticketBack.date, ticketBack.duration);
 
   return (
     <BlankTicket>
@@ -79,14 +80,14 @@ const Ticket = props => {
       </String>
       <String>
         <Col span={8}>
-          <SupportText>{`${segment1.origin} - ${segment1.destination}`}</SupportText>
+          <SupportText>{`${ticketThere.origin} - ${ticketThere.destination}`}</SupportText>
         </Col>
         <Col span={8}>
           <SupportText>в пути</SupportText>
         </Col>
         <Col span={8}>
           <SupportText>
-            {segment1.stops.length > 1 ? `${segment1.stops.length} пересадки` : '1 пересадка'}
+          {ticketThere.stops.length === 0 ? `Без пересадок` : ticketThere.stops.length > 1 ? `${ticketThere.stops.length} пересадки` : '1 пересадка'}
           </SupportText>
         </Col>
         <Col span={8}>
@@ -96,19 +97,19 @@ const Ticket = props => {
           <MainText>{first[1]}</MainText>
         </Col>
         <Col span={8}>
-          <MainText>{segment1.stops.join(',')}</MainText>
+          <MainText>{ticketThere.stops.join(',')}</MainText>
         </Col>
       </String>
       <String>
         <Col span={8}>
-          <SupportText>{`${segment2.origin} - ${segment2.destination}`}</SupportText>
+          <SupportText>{`${ticketBack.origin} - ${ticketBack.destination}`}</SupportText>
         </Col>
         <Col span={8}>
           <SupportText>в пути</SupportText>
         </Col>
         <Col span={8}>
           <SupportText>
-            {segment2.stops.length > 1 ? `${segment2.stops.length} пересадки` : '1 пересадка'}
+            {ticketBack.stops.length === 0 ? `Без пересадок` : ticketBack.stops.length > 1 ? `${ticketBack.stops.length} пересадки` : '1 пересадка'}
           </SupportText>
         </Col>
         <Col span={8}>
@@ -118,7 +119,7 @@ const Ticket = props => {
           <MainText>{second[1]}</MainText>
         </Col>
         <Col span={8}>
-          <MainText>{segment1.stops.join(',')}</MainText>
+          <MainText>{ticketBack.stops.join(',')}</MainText>
         </Col>
       </String>
     </BlankTicket>
