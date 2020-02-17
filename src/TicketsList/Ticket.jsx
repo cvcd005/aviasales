@@ -67,6 +67,8 @@ const Ticket = props => {
 
   const timeThere = createTime(ticketThere.date, ticketThere.duration);
   const timeBack = createTime(ticketBack.date, ticketBack.duration);
+  const transferThereText = ticketThere.stops.length === 0 ? `Без пересадок` : ticketThere.stops.length > 1 ? `${ticketThere.stops.length} пересадки` : '1 пересадка';
+  const transferBackText = ticketBack.stops.length === 0 ? `Без пересадок` : ticketBack.stops.length > 1 ? `${ticketBack.stops.length} пересадки` : '1 пересадка';
 
   return (
     <BlankTicket>
@@ -86,13 +88,7 @@ const Ticket = props => {
           <SupportText>в пути</SupportText>
         </Col>
         <Col span={8}>
-          <SupportText>
-            {ticketThere.stops.length === 0
-              ? `Без пересадок`
-              : ticketThere.stops.length > 1
-              ? `${ticketThere.stops.length} пересадки`
-              : '1 пересадка'}
-          </SupportText>
+          <SupportText>{transferThereText}</SupportText>
         </Col>
         <Col span={8}>
           <MainText>{timeThere[0]}</MainText>
@@ -112,13 +108,7 @@ const Ticket = props => {
           <SupportText>в пути</SupportText>
         </Col>
         <Col span={8}>
-          <SupportText>
-            {ticketBack.stops.length === 0
-              ? `Без пересадок`
-              : ticketBack.stops.length > 1
-              ? `${ticketBack.stops.length} пересадки`
-              : '1 пересадка'}
-          </SupportText>
+          <SupportText>{transferBackText}</SupportText>
         </Col>
         <Col span={8}>
           <MainText>{timeBack[0]}</MainText>

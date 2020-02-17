@@ -128,7 +128,9 @@ class App extends React.Component {
 
   render() {
     const { stateTickets, transferFlag, sortFlag } = this.state;
+    console.time('first');
     const result = this.sortFilter(this.transferFilter(stateTickets)).slice(0, 5);
+    console.timeEnd('first');
     console.log(result);
     return (
       <ContentWrapper>
