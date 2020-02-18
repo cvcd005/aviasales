@@ -1,6 +1,7 @@
 import React from 'react';
-import axios from 'axios';
 import { Col } from 'antd';
+
+import { sortFilter, transferFilter, getSearchId, getChunkTickets } from '../api/api';
 
 import ContentWrapper from '../ContentWrapper';
 import TransferFilter from '../TransferFilter';
@@ -14,9 +15,10 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      stateTickets: [],
+      tickets: [],
       sortFlag: 'fastest',
       transferFlag: { '0': true, '1': false, '2': false, '3': false, all: false },
+      searchId: null,
     };
   }
 
@@ -25,33 +27,21 @@ class App extends React.Component {
   }
 
   getId = async () => {
-    const response = await axios.get('https://front-test.beta.aviasales.ru/search');
+    const response = await getSearchId();
     this.setState({ ...response.data }, () => this.getTickets());
   };
 
   getTickets = async () => {
     const { searchId } = this.state;
-    const response = await axios
-      .get('https://front-test.beta.aviasales.ru/tickets', { params: { searchId } })
-      .catch(() => this.getTickets());
-
-    if (!response) {
-      return;
-    }
-    const { stop, tickets } = response.data;
-    if (!stop) {
-      this.setState(
-        state => {
-          const { stateTickets } = state;
-          return { stateTickets: [...stateTickets, ...tickets] };
-        },
-        () => this.getTickets()
-      );
-    } else {
-      this.setState(state => {
-        const { stateTickets } = state;
-        return { stateTickets: [...stateTickets, ...tickets], isUpdate: false };
-      });
+    try {
+      const response = await getChunkTickets(searchId);
+      const { data } = response;
+      if (data.stop) {
+        return this.setState(state => ({ tickets: [...state.tickets, ...data.tickets] }));
+      }
+      this.setState(state => ({ tickets: [...state.tickets, ...data.tickets] }), this.getTickets);
+    } catch (err) {
+      this.getTickets();
     }
   };
 
@@ -72,53 +62,6 @@ class App extends React.Component {
     }
   };
 
-  transferFilter = ar => {
-    const { transferFlag } = this.state;
-    // если нажата галачка все
-    if (transferFlag.all) {
-      return ar;
-    }
-    const flags = [];
-    for (let i = 0; i < 4; i++) {
-      if (transferFlag[i]) {
-        flags.push(i);
-      }
-    }
-    const stopLeng = stop => flags.includes(stop);
-    const fn = ticket => {
-      const [seg1, seg2] = ticket.segments;
-      return stopLeng(seg1.stops.length) && stopLeng(seg2.stops.length);
-    };
-    return ar.filter(fn);
-  };
-
-  sortFilter = ar => {
-    const { sortFlag } = this.state;
-    if (sortFlag === 'cheapest') {
-      return ar.sort((a, b) => {
-        if (a.price < b.price) {
-          return -1;
-        }
-        if (a.price > b.price) {
-          return 1;
-        }
-        return 0;
-      });
-    }
-    const getDuration = el => el.segments[0].duration + el.segments[1].duration;
-    return ar.sort((el1, el2) => {
-      const a = getDuration(el1);
-      const b = getDuration(el2);
-      if (a > b) {
-        return 1;
-      }
-      if (a < b) {
-        return -1;
-      }
-      return 0;
-    });
-  };
-
   changeSortFlag = () => {
     this.setState(state => {
       const { sortFlag } = state;
@@ -127,8 +70,8 @@ class App extends React.Component {
   };
 
   render() {
-    const { stateTickets, transferFlag, sortFlag } = this.state;
-    const result = this.sortFilter(this.transferFilter(stateTickets)).slice(0, 5);
+    const { tickets, transferFlag, sortFlag } = this.state;
+    const result = sortFilter(transferFilter(tickets, transferFlag), sortFlag).slice(0, 5);
     return (
       <ContentWrapper>
         <TransferFilter changeTransferFlag={this.changeTransferFlag} transferFlag={transferFlag} />

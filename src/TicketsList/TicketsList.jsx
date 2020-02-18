@@ -4,7 +4,7 @@ import Ticket from './Ticket';
 
 const TicketsList = props => {
   const { list } = props;
-  const result = list.map(el => <Ticket obj={el} />);
+  const result = list.map(ticket => <Ticket obj={ticket} />);
   return <div>{result}</div>;
 };
 

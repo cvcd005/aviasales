@@ -5,6 +5,54 @@ import PropTypes from 'prop-types';
 
 import Shape from '../img/Shape.png'; // Tell Webpack this JS file uses this image
 
+class TransferFilter extends React.Component {
+  onClick = evt => {
+    evt.preventDefault();
+    const id = evt.target.getAttribute('for');
+    const { changeTransferFlag } = this.props;
+    changeTransferFlag(id);
+  };
+
+  render() {
+    const { transferFlag } = this.props;
+    return (
+      <Container xs={22} sm={8}>
+        <Title>Количество пересадок </Title>
+        <Label htmlFor="all" active={transferFlag.all} onClick={this.onClick}>
+          <CheckBox id="all" />
+          Все
+        </Label>
+        <Label htmlFor="0" active={transferFlag[0]} onClick={this.onClick}>
+          <CheckBox id="0" />
+          Без пересадок
+        </Label>
+        <Label htmlFor="1" active={transferFlag[1]} onClick={this.onClick}>
+          <CheckBox id="1" />1 пересадка
+        </Label>
+        <Label htmlFor="2" active={transferFlag[2]} onClick={this.onClick}>
+          <CheckBox id="2" />2 пересадки
+        </Label>
+        <Label htmlFor="3" active={transferFlag[3]} onClick={this.onClick}>
+          <CheckBox id="3" />3 пересадки
+        </Label>
+      </Container>
+    );
+  }
+}
+
+TransferFilter.propTypes = {
+  changeTransferFlag: PropTypes.func.isRequired,
+  transferFlag: PropTypes.shape({
+    all: PropTypes.string,
+    '0': PropTypes.bool,
+    '1': PropTypes.bool,
+    '2': PropTypes.bool,
+    '3': PropTypes.bool,
+  }).isRequired,
+};
+
+export default TransferFilter;
+
 const Container = styled(Col)`
   height: 252px;
   background: #ffffff;
@@ -50,50 +98,3 @@ const Label = styled.label.attrs(props => ({ htmlFor: props.htmlFor }))`
     background: ${props => (props.active ? `url(${Shape}) center no-repeat` : 'none')};
   }
 `;
-
-class TransferFilter extends React.Component {
-  onClick = value => evt => {
-    evt.preventDefault();
-    const { changeTransferFlag } = this.props;
-    changeTransferFlag(value);
-  };
-
-  render() {
-    const { transferFlag } = this.props;
-    return (
-      <Container xs={22} sm={8}>
-        <Title>Количество пересадок </Title>
-        <Label htmlFor="all" active={transferFlag.all} onClick={this.onClick('all')}>
-          <CheckBox id="all" />
-          Все
-        </Label>
-        <Label htmlFor="zero" active={transferFlag[0]} onClick={this.onClick(0)}>
-          <CheckBox id="zero" />
-          Без пересадок
-        </Label>
-        <Label htmlFor="one" active={transferFlag[1]} onClick={this.onClick(1)}>
-          <CheckBox id="one" />1 пересадка
-        </Label>
-        <Label htmlFor="two" active={transferFlag[2]} onClick={this.onClick(2)}>
-          <CheckBox id="two" />2 пересадки
-        </Label>
-        <Label htmlFor="three" active={transferFlag[3]} onClick={this.onClick(3)}>
-          <CheckBox id="three" className="pupsik" />3 пересадки
-        </Label>
-      </Container>
-    );
-  }
-}
-
-TransferFilter.propTypes = {
-  changeTransferFlag: PropTypes.func.isRequired,
-  transferFlag: PropTypes.shape({
-    all: PropTypes.string,
-    '0': PropTypes.bool,
-    '1': PropTypes.bool,
-    '2': PropTypes.bool,
-    '3': PropTypes.bool,
-  }).isRequired,
-};
-
-export default TransferFilter;
