@@ -43,7 +43,7 @@ const Ticket = props => {
           <Price>{`${prettyfyPrice} Р`}</Price>
         </Col>
         <Col span={8}>
-          <LogoCompani src={`http://pics.avs.io/99/36/${carrier}.png`} />
+          <LogoCompani src={`https://pics.avs.io/99/36/${carrier}.png`} />
         </Col>
       </String>
       <String>
